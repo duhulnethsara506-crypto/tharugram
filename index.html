@@ -1,21 +1,150 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Tharugram 🖤</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+import { useState } from "react";
 
-<header>
-  <h1>THARUGRAM 🖤</h1>
-  <p>My first live website</p>
-</header>
+// NOTE: Firebase setup (replace with your real config)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_AUTH_DOMAIN",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID",
+};
 
-<section class="post">
-  <h2>Tharu</h2>
-  <p>Night vibes ✨</p>
-  <img src="https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=800">
-</section>
+export default function PhotoSocialSite() {
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [posts, setPosts] = useState([
+    {
+      id: 1,
+      name: "Tharu",
+      likes: "12.4k",
+      caption: "Night vibes ✨",
+      image:
+        "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1200&auto=format&fit=crop",
+    },
+  ]);
 
-</body>
-</html>
+  function login() {
+    // Firebase later replace karanna
+    if (email && password) {
+      setUser(email);
+      if (email === "admin@tharu.com") setIsAdmin(true);
+    }
+  }
+
+  function logout() {
+    setUser(null);
+    setIsAdmin(false);
+  }
+
+  function uploadPost() {
+    const newPost = {
+      id: Date.now(),
+      name: user,
+      likes: "0",
+      caption: "New post",
+      image:
+        "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?q=80&w=1200&auto=format&fit=crop",
+    };
+    setPosts([newPost, ...posts]);
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="w-96 rounded-2xl border border-white/10 bg-white/5 p-6">
+          <h1 className="text-2xl font-bold mb-4">THARUGRAM Login</h1>
+
+          <input
+            className="w-full mb-3 rounded-xl bg-white/10 p-3 outline-none"
+            placeholder="Email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            type="password"
+            className="w-full mb-4 rounded-xl bg-white/10 p-3 outline-none"
+            placeholder="Password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button
+            onClick={login}
+            className="w-full rounded-xl bg-white py-3 font-bold text-black"
+          >
+            Login
+          </button>
+
+          <p className="mt-3 text-sm text-white/50">
+            Admin: admin@tharu.com
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-black text-white">
+      <header className="flex items-center justify-between border-b border-white/10 p-4">
+        <h1 className="text-2xl font-bold">THARUGRAM 🖤</h1>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={uploadPost}
+            className="rounded-xl bg-green-500 px-4 py-2 font-bold"
+          >
+            Upload
+          </button>
+
+          <span className="text-white/60">{user}</span>
+
+          <button
+            onClick={logout}
+            className="rounded-xl bg-red-500 px-4 py-2 font-bold"
+          >
+            Logout
+          </button>
+        </div>
+      </header>
+
+      <main className="grid gap-8 p-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-6">
+          {posts.map((post) => (
+            <div key={post.id} className="rounded-2xl bg-white/5 p-4">
+              <img src={post.image} className="rounded-xl" />
+              <h2 className="mt-3 font-bold">{post.name}</h2>
+              <p className="text-white/70">{post.caption}</p>
+            </div>
+          ))}
+        </div>
+
+        <aside className="space-y-4">
+          <div className="rounded-2xl bg-white/5 p-4">
+            <h3 className="font-bold">Profile</h3>
+            <p className="text-white/60">{user}</p>
+          </div>
+
+          {isAdmin && (
+            <div className="rounded-2xl border border-red-500 bg-white/5 p-4">
+              <h3 className="font-bold text-red-400">Admin Panel</h3>
+
+              <button className="mt-3 w-full rounded-xl bg-red-500 py-2 font-bold">
+                Delete Posts
+              </button>
+
+              <button className="mt-2 w-full rounded-xl bg-yellow-500 py-2 font-bold text-black">
+                Manage Users
+              </button>
+
+              <button className="mt-2 w-full rounded-xl bg-blue-500 py-2 font-bold">
+                Site Settings
+              </button>
+            </div>
+          )}
+        </aside>
+      </main>
+    </div>
+  );
+}
